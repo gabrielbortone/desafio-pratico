@@ -8,7 +8,9 @@
   "author": "Gabriel Bortone",
   "license": "ISC",
   "description": "",
+  "type": "module",
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
   }
 }
