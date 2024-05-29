@@ -1,10 +1,10 @@
 import { promises as fs } from 'fs';
 
 const databasePath = new URL('../db.json', import.meta.url)
-
+const table = 'tasks';
 export class Database {
   #database = {}
-
+  
   constructor() {
     fs.readFile(databasePath, 'utf8')
       .then(data => {
@@ -20,7 +20,10 @@ export class Database {
   }
 
   selectTasks(title, description){
-    return this.#database['tasks'].find(x=>  
+    if(!title && !description)
+      return  this.#database[table];
+
+    return this.#database[table].find(x=>  
         (title != null && x.title.contains(title)) || 
         (description != null && x.description.contains(description)) || 
         (title == null && description == null)
@@ -28,12 +31,11 @@ export class Database {
   }
 
   selectById(id){
-    return this.#database['tasks'].find(x=> x.id == id);
+    return this.#database[table].find(x=> x.id == id);
   }
 
   updateByBody(id, body){
     const task = this.selectById(id);
-    const table = "tasks";
 
     if(task != null){
         try {
@@ -60,7 +62,6 @@ export class Database {
 
   updateMark(id){
     const task = this.selectById(id);
-    const table = "tasks";
     if(task != null){
         try {
             if(task.update_at){
@@ -88,19 +89,19 @@ export class Database {
   }
 
   delete(id){
-    this.#database[tasks] = this.#database[tasks].filter(x=> x.id != id);
+    this.#database[table] = this.#database[table].filter(x=> x.id != id);
     this.#persist();
   }
 
   insert(body){
     if (Array.isArray(this.#database[table])) {
-        this.#database["tasks"].push(data)
+        this.#database[table].push(body)
       } else {
-        this.#database[table] = [data]
+        this.#database[table] = [body]
       }
   
       this.#persist()
   
-      return data
+      return body
   }
 }

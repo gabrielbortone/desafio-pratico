@@ -9,11 +9,11 @@ export const routes = [
     method: 'GET',
     path: buildRoutePath('/tasks'),
     handler: (req, res) => {
-      const { search } = req.query
+      const { title, description } = req.query
 
-      
+      const tasks = database.selectTasks(title, description);
 
-      return res.end(JSON.stringify(users))
+      return res.end(JSON.stringify(tasks))
     }
   },
   {
@@ -31,7 +31,7 @@ export const routes = [
         update_at: null
       }
 
-      database.insert('tasks', task)
+      database.insert(task)
 
       return res.writeHead(201).end()
     }
