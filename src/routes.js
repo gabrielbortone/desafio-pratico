@@ -1,9 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Database } from './database.js'
-import { buildRoutePath } from './utils/build-route-path.js'
-import { parse } from 'csv-parse';
-import fs from 'node:fs';
-import file from 'express-fileupload';
+import { v4 as uuidv4 } from 'uuid';;
+import { Database } from './database.js';
+import { buildRoutePath } from './utils/build-route-path.js';
+import {import_csv, readCSV } from './streams_csv.js';
 
 const database = new Database()
 
@@ -42,23 +40,33 @@ export const routes = [
   {
     method: 'POST',
     path: buildRoutePath('/tasks/csv'),
-    handler: async (req, res) => {
+    handler:  async (req, res) => {
       try{
-        const parser = req.pipe(
-          parse()
-        );
-        let count = 1;
-        process.stdout.write('start\n');
-        for await (const record of parser) {
-          process.stdout.write(`${count++} ${record.join(',')}\n`);
-          await new Promise((resolve) => setTimeout(resolve, 100));
+        const result_lines =  await readCSV();
+
+        for(let i =0; i < result_lines.length -1; i++) {
+
+          const task = {
+            id: uuidv4(),
+            title: result_lines[i].title,
+            description: result_lines[i].description,
+            completed_at: null,
+            created_at: Date.now(),
+            update_at: null
+          }
+    
+          database.insert(task)
+          
         }
+
+        return res.writeHead(201).end()
+
       }catch(e){
+
         console.log(e);
         res.writeHead(400).end
       }
 
-      
     }
   },
   {
